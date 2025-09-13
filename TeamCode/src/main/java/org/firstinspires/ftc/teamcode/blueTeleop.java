@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode;
-import com.arcrobotics.ftclib.util.InterpLUT;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
-public class Teleop extends LinearOpMode {
+public class blueTeleop extends LinearOpMode {
+    private Limelight3A limelight;
+    private double angleFromGoal;
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare motor ok
@@ -22,8 +23,12 @@ public class Teleop extends LinearOpMode {
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("fR");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("bR");
         DcMotor flyWheel = hardwareMap.dcMotor.get("flyWheel");
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
 
+        limelight.setPollRateHz(100);
+        limelight.start();
+        limelight.pipelineSwitch(0);
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead ok.
@@ -40,16 +45,6 @@ public class Teleop extends LinearOpMode {
         //hi twin ok
         imu.initialize(parameters);
 
-        InterpLUT lut = new InterpLUT();
-
-//Adding each val with a key ok
-        lut.add(1.1, 0.2);
-        lut.add(2.7, .5);
-        lut.add(3.6, 0.75);
-        lut.add(4.1, 0.9);
-        lut.add(5, 1);
-//generating final equation ok
-        lut.createLUT();
 
 
 
@@ -71,9 +66,7 @@ public class Teleop extends LinearOpMode {
             }
 
             double distance = 0;  //0: iam limelight
-            if(gamepad1.a){
-                flyWheel.setPower(lut.get(distance));
-            }
+
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             // Rotate the movement direction counter to the bot's rotation ok
@@ -95,6 +88,12 @@ public class Teleop extends LinearOpMode {
             backLeftMotor.setPower(-backLeftPower);
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(-backRightPower);
+
+            LLResult result = limelight.getLatestResult();
+            if(result != null) {
+                angleFromGoal = result.getTx();
+            }
+            telemetry.addData("Angle from goal: ", angleFromGoal);
 
         }
     }

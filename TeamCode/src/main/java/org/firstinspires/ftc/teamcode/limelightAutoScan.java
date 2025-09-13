@@ -16,7 +16,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp
 public class limelightAutoScan extends LinearOpMode {
     private Limelight3A limelight;
-    private String pattern;
+    private boolean gpp;
+    private boolean pgp;
+    private boolean ppg;
+    private boolean scan=false;
+
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare stuff ok
@@ -39,7 +43,7 @@ public class limelightAutoScan extends LinearOpMode {
         limelight.setPollRateHz(100);
         limelight.start();
         limelight.pipelineSwitch(0);
-        pattern="N/A";
+
 
 
         waitForStart();
@@ -48,32 +52,41 @@ public class limelightAutoScan extends LinearOpMode {
 
         while (opModeIsActive()) {
             LLResult result = limelight.getLatestResult();
-            if (result != null && result.getPipelineIndex()==0) {
-                pattern="Green Purple Purple";
-
-            } else if(result != null && result.getPipelineIndex()==1) {
-                pattern="Purple Green Purple";
-            }
-            else if(result != null && result.getPipelineIndex()==2) {
-                pattern="Purple Purple Green";
-            }
-            else{
-                pattern="N/A";
-        }
-            if(gamepad1.a){
-                limelight.pipelineSwitch(0);
-            }
-            if(gamepad1.b){
+            if(result != null && result.getPipelineIndex()==0 && scan){
+                if(result.isValid()){
+                   gpp=true;
+                }
                 limelight.pipelineSwitch(1);
             }
-            if(gamepad1.y){
+            if(result != null && result.getPipelineIndex()==1 && scan){
+                if(result.isValid()){
+                    pgp=true;
+                }
                 limelight.pipelineSwitch(2);
             }
-            if(gamepad1.right_stick_button){
-                telemetry.addData("dat tieu eats cats", pattern);
+            if(result != null && result.getPipelineIndex()==2 && scan){
+                if(result.isValid()){
+                    ppg=true;
+                }
+                limelight.pipelineSwitch(3);
             }
-            telemetry.addData("Pattern is: ", pattern);
+                if(gamepad1.right_stick_button){
+                    telemetry.addData("dat tieu eats cats", gpp);
+                    telemetry.addData("dat tieu eats cats", pgp);
+                    telemetry.addData("dat tieu eats cats", ppg);
+                }
+                if(!gamepad1.right_stick_button) {
+                    telemetry.addData("Green Purple Purple:  ", gpp);
+                    telemetry.addData("Purple Green Purple: ", pgp);
+                    telemetry.addData("Purple Purple Green: ", ppg);
+                }
+                if(gamepad1.a){
+                    scan=true;
+                }
             telemetry.update();
         }
+
+
+
+        }
     }
-}
