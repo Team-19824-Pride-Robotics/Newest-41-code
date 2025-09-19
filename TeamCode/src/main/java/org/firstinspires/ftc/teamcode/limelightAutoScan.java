@@ -59,7 +59,7 @@ public class limelightAutoScan extends LinearOpMode {
             }
             else{
                 pattern="N/A";
-            }
+        }
             if(gamepad1.a){
                 limelight.pipelineSwitch(0);
             }
@@ -70,11 +70,9 @@ public class limelightAutoScan extends LinearOpMode {
                 limelight.pipelineSwitch(2);
             }
             if(gamepad1.right_stick_button){
-                telemetry.addData("dat tieu eats cats: ", pattern);
+                telemetry.addData("dat tieu eats cats", pattern);
             }
-            if(!gamepad1.right_stick_button){
-                telemetry.addData("Pattern is: ", pattern);
-            }
+            telemetry.addData("Pattern is: ", pattern);
             telemetry.update();
         }
     }
