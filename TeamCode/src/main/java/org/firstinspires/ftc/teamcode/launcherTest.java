@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import com.arcrobotics.ftclib.util.InterpLUT;
+import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -13,30 +14,53 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
 public class launcherTest extends LinearOpMode {
+    private double currentTime;
+    private double currentError;
+    private double desiredVelocity;
+    private static double P=0;
+    private static double I=0;
+    private static double D=0;
+    private static double mI=0;
+
+    PIDController pid = new PIDController(P,I,D,0);
+    Timing.Timer timer;
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare motor ok
         // Absolutely yes make ID's match configuration
 
-        DcMotor flyWheel = hardwareMap.dcMotor.get("flyWheel");
+        DcMotorEx flyWheel = hardwareMap.get(DcMotorEx.class, "flyWheel");
 
+        InterpLUT lut = new InterpLUT();
 
+//Adding each val with a key ok
+        lut.add(1.1, 0.2);
+        lut.add(2.7, .5);
+        lut.add(3.6, 0.75);
+        lut.add(4.1, 0.9);
+        lut.add(5, 1);
+//generating final equation ok
+        lut.createLUT();
         waitForStart();
-
+        timer.start();
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
+            currentTime = timer.elapsedTime();
+            currentError = desiredVelocity-flyWheel.getVelocity();
+
 
             if (gamepad1.a) {
                 flyWheel.setPower(1);
             }
             if (!gamepad1.a && !gamepad1.b) {
-                flyWheel.setPower(0);
+                flyWheel.setPower(0.00000000000001);
             }
             if (gamepad1.b) {
                 flyWheel.setPower(-1);
-
             }
+            //flyWheel.setPower(pid.calculate(desiredVelocity, flyWheel.getVelocity()));
+            telemetry.addData("Speed: ", flyWheel.getVelocity());
         }
     }
 }
