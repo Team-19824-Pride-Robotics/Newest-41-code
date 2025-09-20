@@ -23,13 +23,14 @@ public class launcherTest extends LinearOpMode {
     private static double mI=0;
 
     PIDController pid = new PIDController(P,I,D,0);
-    Timing.Timer timer;
+
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare motor ok
         // Absolutely yes make ID's match configuration
 
-        DcMotorEx flyWheel = hardwareMap.get(DcMotorEx.class, "flyWheel");
+        DcMotorEx flyWheel = hardwareMap.get(DcMotorEx.class, "flywheel");
+        DcMotorEx flyWheelB = hardwareMap.get(DcMotorEx.class, "flywheelB");
 
         InterpLUT lut = new InterpLUT();
 
@@ -42,25 +43,29 @@ public class launcherTest extends LinearOpMode {
 //generating final equation ok
         lut.createLUT();
         waitForStart();
-        timer.start();
+
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            currentTime = timer.elapsedTime();
+
             currentError = desiredVelocity-flyWheel.getVelocity();
 
 
             if (gamepad1.a) {
                 flyWheel.setPower(1);
+                flyWheelB.setPower(-1);
             }
             if (!gamepad1.a && !gamepad1.b) {
-                flyWheel.setPower(0.00000000000001);
+                flyWheel.setPower(0);
+                flyWheel.setPower(0);
             }
             if (gamepad1.b) {
                 flyWheel.setPower(-1);
+                flyWheelB.setPower(1);
             }
             //flyWheel.setPower(pid.calculate(desiredVelocity, flyWheel.getVelocity()));
             telemetry.addData("Speed: ", flyWheel.getVelocity());
+            telemetry.update();
         }
     }
 }

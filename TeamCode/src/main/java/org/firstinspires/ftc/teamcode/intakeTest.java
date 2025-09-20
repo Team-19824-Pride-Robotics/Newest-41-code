@@ -17,13 +17,14 @@ import java.util.Timer;
 
 @TeleOp
 public class intakeTest extends LinearOpMode {
+    private DcMotor intake;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        DcMotor intake =hardwareMap.get(DcMotorEx.class, "intake");
         // Declare servo ok
         // Absolutely yes make ID's match configuration
-        CRServo intake1 = hardwareMap.get(CRServo.class, "1");
-        CRServo intake2 = hardwareMap.get(CRServo.class, "2");
+
 
 
 
@@ -38,16 +39,13 @@ public class intakeTest extends LinearOpMode {
         while (opModeIsActive()) {
 
            if(gamepad1.a){
-            intake1.setPower(1);
-            intake2.setPower(-1);
+            intake.setPower(1);
            }
            if(gamepad1.b){
-            intake1.setPower(-1);
-            intake2.setPower(1);
+            intake.setPower(-1);
            }
            if(gamepad1.x){
-            intake1.setPower(0);
-            intake2.setPower(0);
+            intake.setPower(0);
            }
         }
     }

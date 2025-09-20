@@ -7,13 +7,26 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import org.firstinspires.ftc.teamcode.Subsystems.intake;
+import org.firstinspires.ftc.teamcode.Subsystems.flywheel;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
 public class blueTeleop extends LinearOpMode {
     private Limelight3A limelight;
+    private intake intake;
+    private flywheel flyWheel;
+    private double currentTime;
+    private double currentError;
+    private double desiredVelocity;
+    private static double P=0;
+    private static double I=0;
+    private static double D=0;
+    private static double mI=0;
+
     private double angleFromGoal;
+    private double distanceFromGoal;
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare motor ok
@@ -22,9 +35,13 @@ public class blueTeleop extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("bL");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("fR");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("bR");
+
         DcMotor flyWheel = hardwareMap.dcMotor.get("flyWheel");
+
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
+        intake = new intake(hardwareMap);
+        intake.init();
 
         limelight.setPollRateHz(100);
         limelight.start();
@@ -65,7 +82,6 @@ public class blueTeleop extends LinearOpMode {
                 imu.resetYaw();
             }
 
-            double distance = 0;  //0: iam limelight
 
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -89,11 +105,40 @@ public class blueTeleop extends LinearOpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(-backRightPower);
 
+
+
+            //Mechansims
+
+            //intake
+            if (gamepad2.left_trigger > .1 || gamepad2.right_trigger > .1) {
+                intake.intakeIn = Math.pow(gamepad2.right_trigger, 3);
+                intake.intakeOut = Math.pow(-gamepad2.left_trigger, 3);
+                intake.intakeSetPower();
+            }
+
+            //flywheel
+            //currentError = desiredVelocity-flywheel.getVelocity();
+
+
+            if (gamepad1.a) {
+                flyWheel.setPower(1);
+            }
+            if (!gamepad1.a && !gamepad1.b) {
+                flyWheel.setPower(0.00000000000001);
+            }
+            if (gamepad1.b) {
+                flyWheel.setPower(-1);
+            }
+
+            // Retrieve the latest result from the limelight
             LLResult result = limelight.getLatestResult();
             if(result != null) {
                 angleFromGoal = result.getTx();
+                distanceFromGoal = result.getBotposeAvgDist();
             }
             telemetry.addData("Angle from goal: ", angleFromGoal);
+            telemetry.addData("Distance From Goal: ", distanceFromGoal);
+            telemetry.update();
 
         }
     }
