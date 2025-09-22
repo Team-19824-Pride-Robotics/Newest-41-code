@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class intake {
 
     private final DcMotorEx intake;
+    private final DcMotorEx transfer;
     public static double intakeIn;
     public static double intakeOut;
 
@@ -17,6 +18,7 @@ public class intake {
 
     public intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
+        transfer = hardwareMap.get(DcMotorEx.class, "transfer");
 
     }
 
@@ -43,6 +45,7 @@ public class intake {
     }
     public void update() {
         intake.setPower(intakePower);
+        transfer.setPower(intakePower);
     }
 
 }
