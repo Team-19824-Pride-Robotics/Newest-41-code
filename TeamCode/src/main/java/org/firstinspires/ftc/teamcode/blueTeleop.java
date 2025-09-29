@@ -25,10 +25,6 @@ public class blueTeleop extends LinearOpMode {
     private double currentTime;
     private double currentError;
     private double desiredVelocity;
-    private static double P = 0;
-    private static double I = 0;
-    private static double D = 0;
-    private static double mI = 0;
     private static double launchVel=700;
     private double angleFromGoal;
     private double distanceFromGoal;

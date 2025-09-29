@@ -4,6 +4,9 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.PIDController;
+
 @Configurable
 public class flywheel {
 
@@ -12,6 +15,11 @@ public class flywheel {
 
     public double flywheelPower = 0;
     public double flywheelVelocity = 0;
+    private static double P = 0;
+    private static double I = 0;
+    private static double D = 0;
+    private static double mI = 0;
+    private PIDController pidController = new PIDController(P, I, D, mI);
 
     public flywheel(HardwareMap hardwareMap) {
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
@@ -35,7 +43,7 @@ public class flywheel {
     }
 
     public void update(double intakePower) {
-        flywheelB.setVelocity(intakePower);
-        flywheel.setVelocity(-intakePower);
+        flywheelB.setPower(pidController.calculate(intakePower, flywheelB.getVelocity()));
+        flywheel.setPower(pidController.calculate(-intakePower, flywheel.getVelocity()));
     }
 }
