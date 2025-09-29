@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,10 +16,11 @@ import org.firstinspires.ftc.teamcode.Subsystems.flap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
+@Configurable
 public class blueTeleop extends LinearOpMode {
     private Limelight3A limelight;
     private intake intake;
-    private flywheel flyWheel;
+    private flywheel flywheel;
     private flap flap;
     private double currentTime;
     private double currentError;
@@ -27,9 +29,10 @@ public class blueTeleop extends LinearOpMode {
     private static double I = 0;
     private static double D = 0;
     private static double mI = 0;
-
+    private static double launchVel=700;
     private double angleFromGoal;
     private double distanceFromGoal;
+    private boolean launch=false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -40,19 +43,18 @@ public class blueTeleop extends LinearOpMode {
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("rF");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("rB");
 
-        DcMotorEx flyWheel = hardwareMap.get(DcMotorEx.class, "flywheel");
-        DcMotorEx flyWheelB = hardwareMap.get(DcMotorEx.class, "flywheelB");
 
-        //limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         intake = new intake(hardwareMap);
         flap = new flap(hardwareMap);
-        flap.close();
+        flywheel = new flywheel(hardwareMap);
+        flap.closeFlap();
         intake.init();
 
-//        limelight.setPollRateHz(100);
-//        limelight.start();
-//        limelight.pipelineSwitch(0);
+        limelight.setPollRateHz(100);
+        limelight.start();
+        limelight.pipelineSwitch(3);
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead ok.
@@ -68,10 +70,7 @@ public class blueTeleop extends LinearOpMode {
                 RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
         //hi twin ok
         imu.initialize(parameters);
-        flyWheel.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        flyWheel.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        flyWheelB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        flyWheelB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
 
 
         waitForStart();
@@ -79,9 +78,9 @@ public class blueTeleop extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-            double x = gamepad1.left_stick_x;
-            double rx = gamepad1.right_stick_x;
+            double y = -gamepad2.left_stick_y; // Remember, Y stick value is reversed
+            double x = gamepad2.left_stick_x;
+            double rx = gamepad2.right_stick_x;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
@@ -117,35 +116,35 @@ public class blueTeleop extends LinearOpMode {
 
 
             if (gamepad2.a) {
-                flyWheel.setVelocity(1000);
-                flyWheelB.setVelocity(-1000);
+                launch=true;
             }
-            if (!gamepad2.a && !gamepad2.b) {
-                flyWheel.setVelocity(0);
-                flyWheelB.setVelocity(0);
-            }
+
             if (gamepad2.b) {
-                flyWheel.setVelocity(-1000);
-                flyWheelB.setVelocity(1000);
+                launch=false;
             }
 
             if (gamepad2.right_bumper) {
-                flap.open();
+                flap.openFlap();
             }
             if (gamepad2.left_bumper) {
-                flap.close();
+                flap.closeFlap();
             }
-
-            // Retrieve the latest result from the limelight
-//            LLResult result = limelight.getLatestResult();
-//            if(result != null) {
-//                angleFromGoal = result.getTx();
-//                distanceFromGoal = result.getBotposeAvgDist();
-//            }
+            if(launch){
+                flywheel.update(launchVel);
+            } else{
+                flywheel.update(0);
+            }
+             //Retrieve the latest result from the limelight
+            LLResult result = limelight.getLatestResult();
+            if(result != null) {
+                angleFromGoal = result.getTx();
+                distanceFromGoal = result.getBotposeAvgDist();
+            }
             intake.update();
             flap.update();
-            telemetry.addData("Angle from goal: ", angleFromGoal);
+            telemetry.addData("Wheel speed ", flywheel.getSpeed());
             telemetry.addData("Distance From Goal: ", distanceFromGoal);
+            telemetry.addData("Angle From Goal", angleFromGoal);
             telemetry.update();
 
         }

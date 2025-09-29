@@ -1,15 +1,17 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
+@Configurable
 public class flywheel {
 
     private final DcMotorEx flywheel;
     private final DcMotorEx flywheelB;
 
     public double flywheelPower = 0;
+    public double flywheelVelocity = 0;
 
     public flywheel(HardwareMap hardwareMap) {
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
@@ -20,17 +22,20 @@ public class flywheel {
     public void init() {
         flywheel.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         flywheel.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        flywheelB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        flywheelB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
 
 
 
-    public double getVelocity() {
-        return flywheel.getVelocity();
+    public double getSpeed() {
+        flywheelVelocity=flywheel.getVelocity();
+        return flywheelVelocity;
     }
 
     public void update(double intakePower) {
-        flywheelB.setPower(intakePower);
-        flywheel.setPower(intakePower);
+        flywheelB.setVelocity(intakePower);
+        flywheel.setVelocity(-intakePower);
     }
 }

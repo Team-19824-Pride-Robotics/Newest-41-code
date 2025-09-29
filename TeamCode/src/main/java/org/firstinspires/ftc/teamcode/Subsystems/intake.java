@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 
 import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
+@Configurable
 public class intake {
 
     private final DcMotorEx intake;
