@@ -45,6 +45,7 @@ public class blueTeleop extends LinearOpMode {
         intake = new intake(hardwareMap);
         flap = new flap(hardwareMap);
         flywheel = new flywheel(hardwareMap);
+        flywheel.init();
         flap.closeFlap();
         intake.init();
 
