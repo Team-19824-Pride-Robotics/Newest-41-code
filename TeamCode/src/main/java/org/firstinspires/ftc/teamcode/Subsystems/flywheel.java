@@ -15,7 +15,7 @@ public class flywheel {
 
     public double flywheelPower = 0;
     public double flywheelVelocity = 0;
-    private static double P = 0;
+    private static double P = 0.2;
     private static double I = 0;
     private static double D = 0;
     private static double mI = 0;
@@ -38,12 +38,18 @@ public class flywheel {
 
 
     public double getSpeed() {
-        flywheelVelocity=flywheel.getVelocity();
+        flywheelVelocity=flywheelB.getVelocity();
         return flywheelVelocity;
     }
 
     public void update(double intakePower) {
-        flywheelB.setPower(pidController.calculate(intakePower, flywheelB.getVelocity()));
-        flywheel.setPower(pidController.calculate(-intakePower, flywheel.getVelocity()));
+        flywheelVelocity=flywheelB.getVelocity();
+       if(flywheelVelocity<intakePower) {
+            flywheelB.setPower(-pidController.calculate(intakePower, flywheelVelocity));
+            flywheel.setPower(pidController.calculate(intakePower, flywheelVelocity));
+        } else{
+            flywheel.setPower(0);
+            flywheelB.setPower(0);
+        }
     }
 }

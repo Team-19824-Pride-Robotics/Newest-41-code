@@ -25,7 +25,7 @@ public class blueTeleop extends LinearOpMode {
     private double currentTime;
     private double currentError;
     private double desiredVelocity;
-    private static double launchVel=700;
+    private static double launchVel=1000;
     private double angleFromGoal;
     private double distanceFromGoal;
     private boolean launch=false;
@@ -140,6 +140,7 @@ public class blueTeleop extends LinearOpMode {
             intake.update();
             flap.update();
             telemetry.addData("Wheel speed ", flywheel.getSpeed());
+            telemetry.addData("Desired wheel speed", launchVel);
             telemetry.addData("Distance From Goal: ", distanceFromGoal);
             telemetry.addData("Angle From Goal", angleFromGoal);
             telemetry.update();
