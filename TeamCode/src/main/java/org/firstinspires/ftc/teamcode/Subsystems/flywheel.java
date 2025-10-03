@@ -44,12 +44,8 @@ public class flywheel {
 
     public void update(double intakePower) {
         flywheelVelocity=flywheelB.getVelocity();
-       if(flywheelVelocity<intakePower) {
-            flywheelB.setPower(-pidController.calculate(intakePower, flywheelVelocity));
-            flywheel.setPower(pidController.calculate(intakePower, flywheelVelocity));
-        } else{
-            flywheel.setPower(0);
-            flywheelB.setPower(0);
-        }
+            flywheelB.setVelocity(-intakePower);
+            flywheel.setVelocity(intakePower);
+
     }
 }
